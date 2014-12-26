@@ -4,14 +4,7 @@
 
 	ext.tick = function() {
 		// poll status
-		if(!ext.gamepad) {
-			ext.gamepad = navigator.webkitGetGamepads && navigator.webkitGetGamepads()[0];
-			
-			if(ext.gamepad) {
-				console.log("Got it!");
-			}
-		}
-
+		ext.gamepad = navigator.webkitGetGamepads && navigator.webkitGetGamepads()[0];
 		window.webkitRequestAnimationFrame(ext.tick);
 	}
 
@@ -31,8 +24,29 @@
 		};
 	}
 
+	ext.isReady = function() {
+		return !!ext.gamepad;
+	}
+
+	ext.getID = function() {
+		return ext.gamepad.id;
+	}
+
+	ext.getButton = function(btn) {
+		return ext.gamepad.buttons[btn];
+	}
+
+	ext.getAxis = function(axis) {
+		return ext.gamepad.axes[axis];
+	}
+
 	var descriptor = {
 		blocks: [
+			["r", "ready?", "isReady"],
+			["-"],
+			["r", "gamepad ID", "getID"],
+			["r", "get button %n", "getButton", 0],
+			["r", "get axis %n", "getAxis", 0],
 		]
 	}
 
