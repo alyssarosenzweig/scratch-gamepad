@@ -1,16 +1,16 @@
 (function(ext) {
 
-  ext.gamepadSupport = (!!navigator.webkitGetGamepads ||
-                        !!navigator.webkitGamepads);
+  ext.gamepadSupport = (!!navigator.getGamepads ||
+                        !!navigator.gamepads);
   ext.gamepad = null;
 
   ext.tick = function() {
     // poll status
-    ext.gamepad = (navigator.webkitGetGamepads &&
-                   navigator.webkitGetGamepads()[0]);
-    window.webkitRequestAnimationFrame(ext.tick);
+    ext.gamepad = (navigator.getGamepads &&
+                   navigator.getGamepads()[0]);
+    window.requestAnimationFrame(ext.tick);
   };
-  if (ext.gamepadSupport) window.webkitRequestAnimationFrame(ext.tick);
+  if (ext.gamepadSupport) window.requestAnimationFrame(ext.tick);
 
   ext._shutdown = function() {};
 
