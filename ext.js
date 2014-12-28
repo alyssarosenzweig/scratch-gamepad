@@ -2,12 +2,6 @@
 
   var DEADZONE = 8000 / 32767;
 
-  var axes = [
-    ["left x", 0],
-    ["left y", 1],
-    ["right x", 2],
-    ["right y", 3],
-  ];
   var buttons = [
     ["left top", 4],
     ["left bottom", 6],
@@ -27,28 +21,20 @@
     ["right", 15],
   ];
 
-  var menus = {
-    axis: [],
-    button: [],
-  };
-  var axisNames = {};
+  var buttonMenu = [];
   var buttonNames = {};
-  axes.forEach(function(d) {
-    var name = d[0],
-        index = d[1];
-    menus.axis.push(name);
-    axisNames[name] = index;
-  });
   buttons.forEach(function(d) {
     var name = d[0],
         index = d[1];
-    menus.button.push(name);
+    buttonMenu.push(name);
     buttonNames[name] = index;
   });
 
   ext.gamepadSupport = (!!navigator.getGamepads ||
                         !!navigator.gamepads);
   ext.gamepad = null;
+
+  ext.stickDirection = {left: 90, right: 90};
 
   ext.tick = function() {
     ext.gamepad = (navigator.getGamepads &&
@@ -82,20 +68,39 @@
     return button.pressed;
   };
 
-  ext.getAxis = function(name) {
-    var index = axisNames[name];
-    var value = ext.gamepad.axes[index];
-    if (-DEADZONE < value && value < DEADZONE) value = 0;
-    if (index === 1 || index === 3) value = -value;
-    return value * 100;
+  ext.getStick = function(what, stick) {
+    var x, y;
+    switch (stick) {
+      case "left":  x = ext.gamepad.axes[0]; y = -ext.gamepad.axes[1]; break;
+      case "right": x = ext.gamepad.axes[2]; y = -ext.gamepad.axes[3]; break;
+    }
+    if (-DEADZONE < x && x < DEADZONE) x = 0;
+    if (-DEADZONE < y && y < DEADZONE) y = 0;
+
+    switch (what) {
+      case "direction":
+        if (x === 0 && y === 0) {
+          // report the stick's previous direction
+          return ext.stickDirection[stick];
+        }
+        var value = 180 * Math.atan2(x, y) / Math.PI;
+        ext.stickDirection[stick] = value;
+        return value;
+      case "force":
+        return Math.sqrt(x*x + y*y) * 100;
+    }
   };
 
   var descriptor = {
     blocks: [
       ["b", "button %m.button pressed?", "getButton", "X"],
-      ["r", "axis %m.axis", "getAxis", "left x"],
+      ["r", "%m.axisValue of %m.stick stick", "getStick", "direction", "left"],
     ],
-    menus: menus,
+    menus: {
+      button: buttonMenu,
+      stick: ["left", "right"],
+      axisValue: ["direction", "force"],
+    },
   };
 
   ScratchExtensions.register("Gamepad", descriptor, ext);
