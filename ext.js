@@ -62,6 +62,10 @@
     };
   };
 
+  ext.installed = function() {
+    return true;
+  }
+
   ext.getButton = function(name) {
     var index = buttonNames[name];
     var button = ext.gamepad.buttons[index];
@@ -93,6 +97,7 @@
 
   var descriptor = {
     blocks: [
+      ["b", "Gamepad Extension installed?", "installed"],
       ["b", "button %m.button pressed?", "getButton", "X"],
       ["r", "%m.axisValue of %m.stick stick", "getStick", "direction", "left"],
     ],
