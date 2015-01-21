@@ -3,31 +3,29 @@
   var DEADZONE = 8000 / 32767;
 
   var buttons = [
-    ["left top", 4],
-    ["left bottom", 6],
-    ["right top", 5],
-    ["right bottom", 7],
-    ["left stick", 10],
-    ["right stick", 11],
-    ["A", 0],
-    ["B", 1],
-    ["X", 2],
-    ["Y", 3],
-    ["select", 8],
-    ["start", 9],
-    ["up", 12],
-    ["down", 13],
-    ["left", 14],
-    ["right", 15],
+    "A",
+    "B",
+    "X",
+    "Y",
+    "left top",
+    "left bottom",
+    "right top",
+    "right bottom",
+    "select",
+    "start",
+    "left stick",
+    "right stick",
+    "up",
+    "down",
+    "left",
+    "right"
   ];
 
-  var buttonMenu = [];
+  var buttonMenu = ["any"];
   var buttonNames = {};
-  buttons.forEach(function(d) {
-    var name = d[0],
-        index = d[1];
+  buttons.forEach(function(name, i) {
     buttonMenu.push(name);
-    buttonNames[name] = index;
+    buttonNames[name] = i;
   });
 
   ext.gamepadSupport = (!!navigator.getGamepads ||
@@ -64,12 +62,38 @@
 
   ext.installed = function() {
     return true;
+  };
+  
+  var hatFix = [false, false]; //Auto-reset hat
+  ext.hatButton = function(name) {
+    if(!hatFix[0] && ext.getButton(name) == true) {
+        hatFix[0] = true;
+        return true;
+    } else {
+        hatFix[0] = false;
+        return false;
+    }
+  };
+  
+  ext.hatStick = function(stick) {
+    if(!hatFix[1] && ext.getStick("direction", stick) != "false") {
+        hatFix[1] = true;
+        return true;
+    } else {
+        hatFix[1] = false;
+        return false;
+    }
   }
 
   ext.getButton = function(name) {
-    var index = buttonNames[name];
-    var button = ext.gamepad.buttons[index];
-    return button.pressed;
+    if(name != "any") {
+      var index = buttonNames[name];
+      var button = ext.gamepad.buttons[index];
+      return button.pressed;
+    } else {
+      //Test if any of the "pressed' property of the objects inside the array ext.gamepad.buttons matches true
+      return ext.gamepad.buttons.map(function(e) { return e.pressed; }).indexOf(true) > -1;
+    }
   };
 
   ext.getStick = function(what, stick) {
@@ -84,8 +108,8 @@
     switch (what) {
       case "direction":
         if (x === 0 && y === 0) {
-          // report the stick's previous direction
-          return ext.stickDirection[stick];
+          // report false to indicate that the stick isn't pointing to any 2D direction
+          return "false";
         }
         var value = 180 * Math.atan2(x, y) / Math.PI;
         ext.stickDirection[stick] = value;
@@ -94,12 +118,27 @@
         return Math.sqrt(x*x + y*y) * 100;
     }
   };
+  
+  ext.whichButton = function() {
+    try {
+      var result = buttons[ext.gamepad.buttons.map(function(e) {return e.pressed;}).indexOf(true)];
+    } catch (e) {
+      var result = -1;
+    }
+    return result;
+  };
 
   var descriptor = {
     blocks: [
       ["b", "Gamepad Extension installed?", "installed"],
-      ["b", "button %m.button pressed?", "getButton", "X"],
+      ["-"],
+      ["h", "when button %m.button is pressed", "hatButton", "A"],
+      ["h", "when %m.stick stick points at any direction", "hatStick", "left"],
+      ["-"],
+      ["b", "button %m.button pressed?", "getButton", "A"],
       ["r", "%m.axisValue of %m.stick stick", "getStick", "direction", "left"],
+      ["-"],
+      ["r", "Which button is pressed?", "whichButton"]
     ],
     menus: {
       button: buttonMenu,
@@ -111,4 +150,3 @@
   ScratchExtensions.register("Gamepad", descriptor, ext);
 
 })({});
-
