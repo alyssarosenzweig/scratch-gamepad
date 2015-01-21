@@ -109,7 +109,7 @@
   };
   
   ext.getTrigger = function(which) {
-    which = (which == "left trigger") ? 6 : 7;
+    which = (which == "left") ? 6 : 7;
     return ext.gamepad.buttons[which].value;
   }
 
@@ -152,7 +152,7 @@
       ["h", "when %m.stick stick points at any direction", "hatStick", "left"],
       ["-"],
       ["b", "button %m.button pressed?", "getButton", "A"],
-      ["r", "% pressed of %m.trigger", "getTrigger", "left trigger"],
+      ["r", "% pressed of %m.stick trigger", "getTrigger", "left trigger"],
       ["r", "%m.axisValue of %m.stick stick", "getStick", "direction", "left"],
       ["-"],
       ["r", "Which button is pressed?", "whichButton"]
@@ -160,7 +160,6 @@
     menus: {
       button: buttonMenu,
       stick: ["left", "right"],
-      trigger: ["left trigger", "right trigger"],
       axisValue: ["direction", "force"],
     },
   };
