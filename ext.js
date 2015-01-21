@@ -27,9 +27,9 @@
     buttonMenu.push(name);
     buttonNames[name] = i;
   });
-  buttonMenu.splice(8, 0, "left trigger (fully pressed)");
-  buttonMenu.splice(9, 0, "right trigger (fully pressed)");
-  buttonMenu.push("any", "any (fully pressed)");
+  buttonMenu.splice(8, 0, "left trigger (100%)");
+  buttonMenu.splice(9, 0, "right trigger (100%)");
+  buttonMenu.push("any", "any (100%)");
 
   ext.gamepadSupport = (!!navigator.getGamepads ||
                         !!navigator.gamepads);
@@ -67,7 +67,7 @@
     return true;
   };
   
-  var hatFix = [false, false]; //Auto-reset hat
+  var hatFix = [false, false]; //Auto-reset hats
   ext.hatButton = function(name) {
     if(!hatFix[0] && ext.getButton(name) === true) {
         hatFix[0] = true;
@@ -89,10 +89,10 @@
   };
 
   ext.getButton = function(name) {
-    if(name == "left trigger (fully pressed)") {
+    if(name == "left trigger (100%)") {
       return ext.gamepad.buttons[6].value == 1;
     }
-    if(name == "right trigger (fully pressed)") {
+    if(name == "right trigger (100%)") {
       return ext.gamepad.buttons[7].value == 1;
     }
     if(name.indexOf("any") == -1) {
