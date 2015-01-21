@@ -115,7 +115,7 @@
         ext.stickDirection[stick] = value;
         return value;
       case "force":
-        return Math.sqrt(x*x + y*y) * 100;
+        return Math.sqrt(x*x + y*y);
     }
   };
   
