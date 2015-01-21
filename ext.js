@@ -66,7 +66,7 @@
   
   var hatFix = [false, false]; //Auto-reset hat
   ext.hatButton = function(name) {
-    if(!hatFix[0] && ext.getButton(name) == true) {
+    if(!hatFix[0] && ext.getButton(name) === true) {
         hatFix[0] = true;
         return true;
     } else {
@@ -83,7 +83,7 @@
         hatFix[1] = false;
         return false;
     }
-  }
+  };
 
   ext.getButton = function(name) {
     if(name != "any") {
@@ -120,10 +120,9 @@
   };
   
   ext.whichButton = function() {
-    try {
-      var result = buttons[ext.gamepad.buttons.map(function(e) {return e.pressed;}).indexOf(true)];
-    } catch (e) {
-      var result = -1;
+    var result = buttons[ext.gamepad.buttons.map(function(e) {return e.pressed;}).indexOf(true)];
+    if(typeof result != "undefined") {
+      result = -1;
     }
     return result;
   };
