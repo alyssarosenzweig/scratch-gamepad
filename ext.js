@@ -7,10 +7,10 @@
     "B",
     "X",
     "Y",
-    "left top",
-    "left bottom",
-    "right top",
-    "right bottom",
+    "left button",
+    "right button",
+    "left trigger",
+    "right trigger",
     "select",
     "start",
     "left stick",
@@ -21,12 +21,15 @@
     "right"
   ];
 
-  var buttonMenu = ["any"];
+  var buttonMenu = [];
   var buttonNames = {};
   buttons.forEach(function(name, i) {
     buttonMenu.push(name);
     buttonNames[name] = i;
   });
+  buttonMenu.splice(8, 0, "left trigger (fully pressed)");
+  buttonMenu.splice(9, 0, "right trigger (fully pressed)");
+  buttonMenu.push("any", "any (fully pressed)");
 
   ext.gamepadSupport = (!!navigator.getGamepads ||
                         !!navigator.gamepads);
@@ -86,15 +89,29 @@
   };
 
   ext.getButton = function(name) {
-    if(name != "any") {
+    if(name == "left trigger (fully pressed)") {
+      return ext.gamepad.buttons[6].value == 1;
+    }
+    if(name == "right trigger (fully pressed)") {
+      return ext.gamepad.buttons[7].value == 1;
+    }
+    if(name.indexOf("any") == -1) {
       var index = buttonNames[name];
       var button = ext.gamepad.buttons[index];
       return button.pressed;
     } else {
-      //Test if any of the "pressed' property of the objects inside the array ext.gamepad.buttons matches true
-      return ext.gamepad.buttons.map(function(e) { return e.pressed; }).indexOf(true) > -1;
+      if(name == "any") {
+        return ext.gamepad.buttons.map(function(e) { return e.pressed; }).indexOf(true) > -1;
+      } else {
+        return ext.gamepad.buttons.map(function(e) { return e.value; }).indexOf(1) > -1;
+      }
     }
   };
+  
+  ext.getTrigger = function(which) {
+    which = (which == "left trigger") ? 6 : 7;
+    return ext.gamepad.buttons[which].value;
+  }
 
   ext.getStick = function(what, stick) {
     var x, y;
@@ -135,6 +152,7 @@
       ["h", "when %m.stick stick points at any direction", "hatStick", "left"],
       ["-"],
       ["b", "button %m.button pressed?", "getButton", "A"],
+      ["r", "% pressed of %m.trigger", "getTrigger", "left trigger"],
       ["r", "%m.axisValue of %m.stick stick", "getStick", "direction", "left"],
       ["-"],
       ["r", "Which button is pressed?", "whichButton"]
@@ -142,6 +160,7 @@
     menus: {
       button: buttonMenu,
       stick: ["left", "right"],
+      trigger: ["left trigger", "right trigger"],
       axisValue: ["direction", "force"],
     },
   };
