@@ -121,7 +121,7 @@
   
   ext.whichButton = function() {
     var result = buttons[ext.gamepad.buttons.map(function(e) {return e.pressed;}).indexOf(true)];
-    if(typeof result != "undefined") {
+    if(typeof result == "undefined") {
       result = -1;
     }
     return result;
